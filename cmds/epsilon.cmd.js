@@ -1,6 +1,50 @@
 
 const _ = require('lodash');
 
+const Button = (text, style = 'danger') => {
+	return {
+		type: 'button',
+		text: { text, emoji: true, type: 'plain_text' },
+		style,
+	};
+};
+
+const Image = (image_url, alt_text = '') => {
+	return { image_url, alt_text, type: 'image' };
+};
+
+const Markdown = (text) => {
+	return { text, type: 'mrkdwn' };
+};
+
+const Dropdown = (action_id, options) => {
+	options = _.map(options, (text, value) => ({ value, text: { text, emoji: true, type: 'plain_text' } }));
+	return {
+		type: 'static_select',
+		action_id,
+		initial_option: _.first(options),
+		options,
+	};
+};
+
+const SectionBlock = (options) => {
+	return _.extend({ type: 'section' }, options);
+};
+
+const ActionsBlock = (elements) => {
+	if (!_.isArray(elements)) elements = [elements];
+	return { type: 'actions', elements };
+};
+
+const ContextBlock = (elements) => {
+	if (!_.isArray(elements)) elements = [elements];
+	return { type: 'context', elements };
+};
+
+const Divider = () => {
+	return { type: 'divider' };
+};
+
 module.exports = {
 	url    : '/epsilon',
 	handle : (msg, info, reply, error) => {
@@ -10,100 +54,53 @@ module.exports = {
 
 		console.log(info);
 
-		return reply({
-			"channel": "general",
-			"text": "fallback text for notifications",
-			"blocks": [
-				{
-					"type": "section",
-					"text": {"type": "mrkdwn", "text": "_Pick your #1 choice, if you have one:_"},
-					"accessory": {
-						"type": "static_select",
-						"action_id": "bleep",
-						"initial_option": {"value": "<any>", "text":{"type":"plain_text", "text": "Don't Care" } },
-						"options": [
-							{"value": "<any>", "text":{"type":"plain_text", "text": "Don't Care"} },
-							{"value": "Captain", "text":{"type":"plain_text", "emoji": true, "text": ":captain-2: Captain"} },
-							{"value": "Helms", "text":{"type":"plain_text", "emoji": true, "text": ":helms: Helms"} },
-							{"value": "Weapons", "text":{"type":"plain_text", "emoji": true, "text": ":weapons: Weapons"} },
-							{"value": "Engineering", "text":{"type":"plain_text", "emoji": true, "text": ":engineering: Engineering"} },
-							{"value": "Science", "text":{"type":"plain_text", "emoji": true, "text": ":science: Science"} },
-							{"value": "Relay", "text":{"type":"plain_text", "emoji": true, "text": ":relay: Relay"} },
-							{"value": "Fighter Pilot", "text":{"type":"plain_text", "emoji": true, "text": ":fighter: Fighter Pilot"} }
-						]
-					}
-				},
-				{
-					"type": "divider"
-				},
-				{
-					"type": "section",
-					"text": {"type": "mrkdwn", "text": "_Then select which roles you are *willing* to play if you don't get your #1 choice:_"}
-				},
-				{
-					"type": "actions",
-					"elements": [
-						{
-							"type": "button",
-							"text": {"type": "plain_text", "emoji": true, "text": ":captain-2: Captain"}
-						},
-						{
-							"type": "button",
-							"text": {"type": "plain_text", "emoji": true, "text": ":helms: Helms"}
-						},
-						{
-							"type": "button",
-							"text": {"type": "plain_text", "emoji": true, "text": ":weapons: Weapons"}
-						},
-						{
-							"type": "button",
-							"text": {"type": "plain_text", "emoji": true, "text": ":engineering: Engineering"}
-						},
-						{
-							"type": "button",
-							"text": {"type": "plain_text", "emoji": true, "text": ":science: Science"}
-						},
-						{
-							"type": "button",
-							"text": {"type": "plain_text", "emoji": true, "text": ":relay: Relay"}
-						},
-						{
-							"type": "button",
-							"text": {"type": "plain_text", "emoji": true, "text": ":fighter: Fighter Pilot"}
-						}
-					]
-				},
-				{
-					"type": "divider"
-				},
-				{
-					"type": "section",
-					"text": {"type": "mrkdwn", "text": "You have chosen to play as:\n*:captain-2: Captain*, *:weapons: Weapons*, *:relay: Relay*, or *:fighter: Fighter Pilot*\n(but ideally *:weapons: Weapons*)"},
-					"accessory": {
-						"type": "image",
-						"alt_text": "empty epsilon logo",
-						"image_url": "https://daid.github.io/EmptyEpsilon/images/logo.png"
-					}
-				},
-				{
-					"type": "divider"
-				},
-				{
-					"type": "actions",
-					"elements": [{
-						"type": "button",
-						"text": {"type": "plain_text", "text": "ＲＥＡＤＹ  ＵＰ"},
-						"style": "primary"
-					}]
-				},
-				{
-					"type": "context",
-					"elements": [{
-						"type": "mrkdwn",
-						"text": "_Remember, you can always type `/epsilon` and edit your choices later!_"
-					}]
-				}
-			]
-		});
+		const result = {
+			channel: info.channel_name,
+			text: 'fallback text for notifications',
+			blocks: [
+				SectionBlock({
+					text      : Markdown('_Pick your #1 choice, if you have one:_'),
+					accessory : Dropdown('bleep', {
+						'<any>'         : "Don't Care",
+						'Captain'       : ':captain-2: Captain',
+						'Helms'         : ':helms: Helms',
+						'Weapons'       : ':weapons: Weapons',
+						'Engineering'   : ':engineering: Engineering',
+						'Science'       : ':science: Science',
+						'Relay'         : ':relay: Relay',
+						'Fighter Pilot' : ':fighter: Fighter Pilot',
+					}),
+				}),
+
+				Divider(),
+
+				SectionBlock({
+					text: Markdown("_Then select which roles you are *willing* to play if you don't get your #1 choice:_"),
+				}),
+				ActionsBlock([
+					Button(':captain-2: Captain'),
+					Button(':helms: Helms'),
+					Button(':weapons: Weapons'),
+					Button(':engineering: Engineering'),
+					Button(':science: Science'),
+					Button(':relay: Relay'),
+					Button(':fighter: Fighter Pilot'),
+				]),
+
+				Divider(),
+
+				SectionBlock({
+					text      : Markdown('You have chosen to play as:\n*:captain-2: Captain*, *:weapons: Weapons*, *:relay: Relay*, or *:fighter: Fighter Pilot*\n(but ideally *:weapons: Weapons*)'),
+					accessory : Image('https://daid.github.io/EmptyEpsilon/images/logo.png', 'empty epsilon logo'),
+				}),
+
+				Divider(),
+
+				ActionsBlock(Button('ＲＥＡＤＹ  ＵＰ', 'primary')),
+				ContextBlock(Markdown('_Remember, you can always type `/epsilon` and edit your choices later!_')),
+			],
+		};
+		console.log('**message response', JSON.stringify(result, null, 2));
+		return reply(result);
 	},
 };

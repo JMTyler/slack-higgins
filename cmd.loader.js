@@ -4,6 +4,7 @@ const path = require('path');
 const Slack = require('pico-slack');
 
 const router = require('express').Router();
+router.use(require('body-parser').urlencoded());
 
 const formatResponse = (response)=>{
 	if(_.isString(response)){

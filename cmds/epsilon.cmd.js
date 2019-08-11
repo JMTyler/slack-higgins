@@ -1,5 +1,6 @@
 
 const _ = require('lodash');
+const Slack = require('pico-slack');
 
 const Button = (text, style = 'danger') => {
 	return {
@@ -54,53 +55,58 @@ module.exports = {
 
 		console.log(info);
 
-		const result = {
-			channel: info.channel_name,
-			text: 'fallback text for notifications',
-			blocks: [
-				SectionBlock({
-					text      : Markdown('_Pick your #1 choice, if you have one:_'),
-					accessory : Dropdown('bleep', {
-						'<any>'         : "Don't Care",
-						'Captain'       : ':captain-2: Captain',
-						'Helms'         : ':helms: Helms',
-						'Weapons'       : ':weapons: Weapons',
-						'Engineering'   : ':engineering: Engineering',
-						'Science'       : ':science: Science',
-						'Relay'         : ':relay: Relay',
-						'Fighter Pilot' : ':fighter: Fighter Pilot',
-					}),
+		const blocks = [
+			SectionBlock({
+				text      : Markdown("_What's your #1 choice?_"),
+				accessory : Dropdown('bleep', {
+					'<any>'         : "Don't Care",
+					'Captain'       : ':captain-2: Captain',
+					'Helms'         : ':helms: Helms',
+					'Weapons'       : ':weapons: Weapons',
+					'Engineering'   : ':engineering: Engineering',
+					'Science'       : ':science: Science',
+					'Relay'         : ':relay: Relay',
+					'Fighter Pilot' : ':fighter: Fighter Pilot',
 				}),
+			}),
 
-				Divider(),
+			Divider(),
 
-				SectionBlock({
-					text: Markdown("_Then select which roles you are *willing* to play if you don't get your #1 choice:_"),
-				}),
-				ActionsBlock([
-					Button(':captain-2: Captain'),
-					Button(':helms: Helms'),
-					Button(':weapons: Weapons'),
-					Button(':engineering: Engineering'),
-					Button(':science: Science'),
-					Button(':relay: Relay'),
-					Button(':fighter: Fighter Pilot'),
-				]),
+			SectionBlock({
+				text: Markdown("_Which roles are you *willing* to play, if you don't get your #1 choice?_"),
+			}),
+			ActionsBlock([
+				Button(':captain-2: Captain'),
+				Button(':helms: Helms'),
+				Button(':weapons: Weapons'),
+				Button(':engineering: Engineering'),
+				Button(':science: Science'),
+				Button(':relay: Relay'),
+				Button(':fighter: Fighter Pilot'),
+			]),
 
-				Divider(),
+			Divider(),
 
-				SectionBlock({
-					text      : Markdown('You have chosen to play as:\n*:captain-2: Captain*, *:weapons: Weapons*, *:relay: Relay*, or *:fighter: Fighter Pilot*\n(but ideally *:weapons: Weapons*)'),
-					accessory : Image('https://daid.github.io/EmptyEpsilon/images/logo.png', 'empty epsilon logo'),
-				}),
+			SectionBlock({
+				text      : Markdown('You have chosen to play as:\n*:captain-2: Captain*, *:weapons: Weapons*, *:relay: Relay*, or *:fighter: Fighter Pilot*\n(but ideally *:weapons: Weapons*)'),
+				accessory : Image('https://daid.github.io/EmptyEpsilon/images/logo.png', 'empty epsilon logo'),
+			}),
 
-				Divider(),
+			Divider(),
 
-				ActionsBlock(Button('ＲＥＡＤＹ  ＵＰ', 'primary')),
-				ContextBlock(Markdown('_Remember, you can always type `/epsilon` and edit your choices later!_')),
-			],
-		};
-		console.log('**message response', JSON.stringify(result, null, 2));
-		return reply(result);
+			ActionsBlock(Button('ＲＥＡＤＹ  ＵＰ', 'primary')),
+			ContextBlock(Markdown('_Remember, you can always type `/epsilon` and edit your choices later!_')),
+		];
+		console.log('**message response', JSON.stringify(blocks, null, 2));
+		return reply({
+//		Slack.api('chat.postMessage', {
+			channel    : info.channel_id,
+			username   : "Ship's Computer",
+			icon_emoji : ':rocket:',
+			text       : 'fallback text for notifications',
+			blocks,
+		});
+//		return res.status(200).send({ delete_original: true });
+		return reply();
 	},
 };

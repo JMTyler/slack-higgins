@@ -26,9 +26,12 @@ const sendResponse = (actionInfo, response) => {
 	});
 };
 
-module.exports = (actionFolder)=>{
+module.exports = (actionFolders)=>{
 	return new Promise((resolve, reject)=>{
-		glob(`${actionFolder}/**/*.action.js`, {}, (err, files)=>{
+		if(!_.isArray(actionFolders)) actionFolders = [actionFolders];
+		actionFolders = actionFolders.map((folder)=>`${folder}/**/*.action.js`);
+		const globPattern = actionFolders.length == 1 ? _.first(actionFolders) : '{' + actionFolders.join(',') + '}';
+		glob(globPattern, {}, (err, files)=>{
 			if(err) return reject(err);
 			return resolve(files);
 		});
@@ -48,11 +51,18 @@ module.exports = (actionFolder)=>{
 			const Actions = _.mapKeys(actions, 'id');
 			router.post('/action', (req, res)=>{
 				const input = JSON.parse(req.body.payload);
-				if (!Actions[input.callback_id]) return res.status(422).send();
+				console.log('* ACTION:', input);
+				const pathToActionId = ({
+					message_action : 'callback_id',
+					block_actions  : 'actions[0].action_id',
+				})[input.type];
+
+				const actionId = _.get(input, pathToActionId);
+				if (!actionId || !Actions[actionId]) return res.status(422).send();
 				res.status(200).send();
 
 				try {
-					Actions[input.callback_id].handle(
+					Actions[actionId].handle(
 						input.message.text,
 						input,
 						(response) => {

@@ -69,8 +69,8 @@ app.get('/', (req, res)=>{
 
 Slack.connect(config.get('slack_bot_token'))
 	.then(()=>loadBots())
-	.then(()=>loadCmds('./cmds')).then((cmdRouter)=>app.use(cmdRouter))
-	.then(()=>loadActions('./actions')).then((actionRouter)=>app.use(actionRouter))
+	.then(()=>loadCmds(['./bots', './cmds'])).then((cmdRouter)=>app.use(cmdRouter))
+	.then(()=>loadActions(['./bots', './actions'])).then((actionRouter)=>app.use(actionRouter))
 	.then(()=>app.listen(process.env.PORT || 8000))
 	.then(()=>Slack.debug('Rebooted!'))
 	.catch((err)=>Slack.error(err));

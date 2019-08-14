@@ -16,9 +16,12 @@ const formatResponse = (response)=>{
 	}
 };
 
-module.exports = (cmdFolder)=>{
+module.exports = (cmdFolders)=>{
 	return new Promise((resolve, reject)=>{
-		glob(`${cmdFolder}/**/*.cmd.js`, {}, (err, files)=>{
+		if(!_.isArray(cmdFolders)) cmdFolders = [cmdFolders];
+		cmdFolders = cmdFolders.map((folder)=>`${folder}/**/*.cmd.js`);
+		const globPattern = cmdFolders.length == 1 ? _.first(cmdFolders) : '{' + cmdFolders.join(',') + '}';
+		glob(globPattern, {}, (err, files)=>{
 			if(err) return reject(err);
 			return resolve(files);
 		});

@@ -1,8 +1,9 @@
 const _ = require('lodash');
 
-const Button = (text, value, style = 'danger') => {
+const Button = (action_id, text, value, style = undefined) => {
 	return {
 		type: 'button',
+		action_id,
 		value,
 		text: { text, emoji: true, type: 'plain_text' },
 		style,
@@ -63,9 +64,15 @@ module.exports = {
 	track(user, state) {
 		State[user] = _.extend({}, State[user], state);
 	},
+	approveRole(user, role) {
+		State[user] = State[user] || {};
+		State[user].roles = _.chain(State[user].roles || []).concat(role).uniq().sortBy((r) => _.indexOf(ROLES, r)).value();
+	},
 
 	buildUI(user) {
 		const state = State[user] || {};
+		// *:captain-2: Captain*, *:weapons: Weapons*, *:relay: Relay*, or *:fighter: Fighter Pilot*
+		const chosenRoles = state.roles ? '*' + _.map(state.roles, (r) => ROLE_LABELS[r]).join('*, *') + '*' : 'nothing yet';
 		return [
 			SectionBlock({
 				text      : Markdown("_What's your #1 choice?_"),
@@ -87,19 +94,19 @@ module.exports = {
 				text: Markdown("_Which roles are you *willing* to play, if you don't get your #1 choice?_"),
 			}),
 			ActionsBlock([
-				Button(':captain-2: Captain', 'Captain'),
-				Button(':helms: Helms', 'Helms'),
-				Button(':weapons: Weapons', 'Weapons'),
-				Button(':engineering: Engineering', 'Engineering'),
-				Button(':science: Science', 'Science'),
-				Button(':relay: Relay', 'Relay'),
-				Button(':fighter: Fighter Pilot', 'Fighter Pilot'),
+				Button('epsilon_approve_a', ':captain-2: Captain', 'Captain'),
+				Button('epsilon_approve_b', ':helms: Helms', 'Helms'),
+				Button('epsilon_approve_c', ':weapons: Weapons', 'Weapons'),
+				Button('epsilon_approve_d', ':engineering: Engineering', 'Engineering'),
+				Button('epsilon_approve_e', ':science: Science', 'Science'),
+				Button('epsilon_approve_f', ':relay: Relay', 'Relay'),
+				Button('epsilon_approve_g', ':fighter: Fighter Pilot', 'Fighter Pilot'),
 			]),
 
 			Divider(),
 
 			SectionBlock({
-				text      : Markdown(`You have chosen to play as:\n*:captain-2: Captain*, *:weapons: Weapons*, *:relay: Relay*, or *:fighter: Fighter Pilot*\n(but ideally *${state.topChoice ? ROLE_LABELS[state.topChoice] : 'srsly fucking choose something'}*)`),
+				text      : Markdown(`You have chosen to play as:\n${chosenRoles}\n(but ideally *${state.topChoice ? ROLE_LABELS[state.topChoice] : 'srsly fucking choose something'}*)`),
 				accessory : Image('https://daid.github.io/EmptyEpsilon/images/logo.png', 'empty epsilon logo'),
 			}),
 

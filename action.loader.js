@@ -51,12 +51,10 @@ module.exports = (actionFolders)=>{
 			const Actions = _.mapKeys(actions, 'id');
 			router.post('/action', (req, res)=>{
 				const input = JSON.parse(req.body.payload);
-				console.log('* ACTION:', input);
 				const pathToActionId = ({
 					message_action : 'callback_id',
 					block_actions  : 'actions[0].action_id',
 				})[input.type];
-
 				const actionId = _.get(input, pathToActionId);
 				if (!actionId || !Actions[actionId]) return res.status(422).send();
 				res.status(200).send();

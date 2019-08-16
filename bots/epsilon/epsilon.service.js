@@ -47,6 +47,7 @@ const Divider = () => {
 };
 
 const ROLES = ['Captain', 'Helms', 'Weapons', 'Engineering', 'Science', 'Relay', 'Fighter Pilot'];
+const State = {};
 
 const ROLE_LABELS = {
 	'Captain'       : ':captain-2: Captain',
@@ -59,11 +60,16 @@ const ROLE_LABELS = {
 };
 
 module.exports = {
+	track(user, state) {
+		State[user] = _.extend({}, State[user], state);
+	},
+
 	buildUI(user) {
+		const state = State[user] || {};
 		return [
 			SectionBlock({
 				text      : Markdown("_What's your #1 choice?_"),
-				accessory : Dropdown('bleep', {
+				accessory : Dropdown('epsilon_topchoice', {
 					'<any>'         : "Don't Care",
 					'Captain'       : ':captain-2: Captain',
 					'Helms'         : ':helms: Helms',
@@ -72,7 +78,7 @@ module.exports = {
 					'Science'       : ':science: Science',
 					'Relay'         : ':relay: Relay',
 					'Fighter Pilot' : ':fighter: Fighter Pilot',
-				}),
+				}, state.topChoice),
 			}),
 
 			Divider(),
@@ -93,7 +99,7 @@ module.exports = {
 			Divider(),
 
 			SectionBlock({
-				text      : Markdown('You have chosen to play as:\n*:captain-2: Captain*, *:weapons: Weapons*, *:relay: Relay*, or *:fighter: Fighter Pilot*\n(but ideally *:weapons: Weapons*)'),
+				text      : Markdown(`You have chosen to play as:\n*:captain-2: Captain*, *:weapons: Weapons*, *:relay: Relay*, or *:fighter: Fighter Pilot*\n(but ideally *${state.topChoice ? ROLE_LABELS[state.topChoice] : 'srsly fucking choose something'}*)`),
 				accessory : Image('https://daid.github.io/EmptyEpsilon/images/logo.png', 'empty epsilon logo'),
 			}),
 

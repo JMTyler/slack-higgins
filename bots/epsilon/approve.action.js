@@ -3,7 +3,7 @@ const Slack = require('pico-slack');
 const EpsilonService = require('./epsilon.service');
 
 module.exports = {
-	id     : 'epsilon_approve_a',
+	id     : ['a', 'b', 'c', 'd', 'e', 'f', 'g'].map((suffix) => `epsilon_approve_${suffix}`),
 	handle : async (msg, info, reply, error) => {
 		console.log('* INFO:', info);
 		const user = info.user.name;

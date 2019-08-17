@@ -39,7 +39,9 @@ module.exports = (actionFolders)=>{
 		.then((actionpaths)=>{
 			return _.reduce(actionpaths, (r, actionpath)=>{
 				try {
-					r.push(require(actionpath));
+					let action = require(actionpath);
+					if (_.isArray(action.id)) action = _.map(action.id, (id) => ({ id, handle: action.handle }));
+					r = r.concat(action);
 					console.log('loaded', actionpath);
 				} catch (e){
 					Slack.error('Action Load Error', e);

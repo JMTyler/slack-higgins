@@ -2,35 +2,38 @@ const _ = require('lodash');
 const DB = require('../db.js');
 const Slack = require('pico-slack');
 
-const MessageModel = DB.sequelize.define('Message', {
+class Message extends DB.Sequelize.Model {}
+Message.init({
 	author : {
-		type : DB.Sequelize.TEXT,
+		type      : DB.Sequelize.TEXT,
 		allowNull : false,
 	},
 	channel : {
-		type : DB.Sequelize.TEXT,
+		type      : DB.Sequelize.TEXT,
 		allowNull : false,
 	},
 	messageTimestamp : {
-		type : DB.Sequelize.TEXT,
+		type      : DB.Sequelize.TEXT,
 		allowNull : false,
 	},
 	body : {
-		type : DB.Sequelize.TEXT,
+		type      : DB.Sequelize.TEXT,
 		allowNull : false,
 	},
 	flaggedBy : {
-		type : DB.Sequelize.TEXT,
+		type      : DB.Sequelize.TEXT,
 		allowNull : false,
 	},
 }, {
-	schema : 'public',
+	sequelize : DB.sequelize,
+	schema    : 'public',
+	tableName : 'Messages',
 });
 
 let initialized = false;
 const initialize = async () => {
 	if (initialized) return;
-	await MessageModel.sync();
+	await Message.sync();
 	initialized = true;
 };
 
@@ -45,12 +48,12 @@ module.exports = {
 
 		try {
 			await initialize();
-			const flagged = await MessageModel.findOne({ where: { channel, messageTimestamp } });
+			const flagged = await Message.findOne({ where: { channel, messageTimestamp } });
 			if (flagged) {
 				return error(`That message was already flagged by ${flagged.flaggedBy}! :joy_b:`);
 			}
 
-			await MessageModel.create({
+			await Message.create({
 				channel,
 				messageTimestamp,
 				flaggedBy,
@@ -59,12 +62,12 @@ module.exports = {
 				body   : msg,
 			});
 
-			const count = await MessageModel.count();
+			const count = await Message.count();
 
 			return reply({ attachments: [{ pretext: `Message successfully flagged. :thumbsup:`, footer: `Total number of flagged messages: ${count}` }] });
 		} catch (err) {
 			console.error('[SecretAction]', err.message, err);
-			return error(`*Something went wrong.* -- ${err.message}`);
+			return error(`*i got all jacked up:* ${err.message}`);
 		}
 	}
 };

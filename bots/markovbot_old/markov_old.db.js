@@ -6,33 +6,36 @@ const redis = require('pico-redis')('markov');
 const MIN = 60 * 1000;
 const BATCH_DELAY = 5 * MIN;
 
-// const MappingModel = DB.sequelize.define('Mapping', {
+// class Mapping extends DB.Sequelize.Model {}
+// Mapping.init({
 // 	user : {
-// 		type : DB.Sequelize.TEXT,
+// 		type      : DB.Sequelize.TEXT,
 // 		allowNull : false,
-// 		unique : true,
+// 		unique    : true,
 // 	},
 // 	msgs : {
-// 		type : DB.Sequelize.INTEGER,
+// 		type      : DB.Sequelize.INTEGER,
 // 		allowNull : false,
 // 	},
 // 	letters : {
-// 		type : DB.Sequelize.INTEGER,
+// 		type      : DB.Sequelize.INTEGER,
 // 		allowNull : false,
 // 	},
 // 	weights : {
-// 		type : DB.Sequelize.JSONB,
-// 		allowNull : false,
+// 		type         : DB.Sequelize.JSONB,
+// 		allowNull    : false,
 // 		defaultValue : {},
 // 	},
 // 	// TODO: Try adding some indexes and see if we can realistically remove this.
 // 	totals : {
-// 		type : DB.Sequelize.JSONB,
-// 		allowNull : false,
+// 		type         : DB.Sequelize.JSONB,
+// 		allowNull    : false,
 // 		defaultValue : {},
 // 	},
 // }, {
-// 	schema : 'Markov',
+// 	sequelize : DB.sequelize,
+// 	schema    : 'Markov',
+// 	tableName : 'Mappings',
 // });
 
 const convertToDb = (user, mapping) => {
@@ -55,7 +58,7 @@ const MarkovDB = {
 	async getMapping(user) {
 		if(!Cache[user]) {
 			//await MarkovDB.initialize();
-			//const mapping = await MappingModel.findOne({ where: { user }});
+			//const mapping = await Mapping.findOne({ where: { user }});
 			//Cache[user] = convertFromDb(mapping);
 			Cache[user] = await redis.get(user) || { msgs: 0, letters: 0, totals: {}, weights: {} };
 		}
@@ -121,7 +124,7 @@ const MarkovDB = {
 	async initialize() {
 		if (MarkovDB.initialized) return;
 		//await DB.sequelize.createSchema('"Markov"');
-		//await MappingModel.sync();
+		//await Mapping.sync();
 		MarkovDB.initialized = true;
 	},
 };

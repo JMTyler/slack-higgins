@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const EpsilonDB = require('./epsilon.storage.js');
 
 const Button = (action_id, text, value, style = undefined) => {
 	return {
@@ -47,10 +48,7 @@ const Divider = () => {
 	return { type: 'divider' };
 };
 
-const ROLES = ['Captain', 'Helms', 'Weapons', 'Engineering', 'Science', 'Relay', 'Fighter Pilot'];
-const State = {};
-
-const ROLE_LABELS = {
+const ROLES = {
 	'Captain'       : ':captain-2: Captain',
 	'Helms'         : ':helms: Helms',
 	'Weapons'       : ':weapons: Weapons',
@@ -61,18 +59,30 @@ const ROLE_LABELS = {
 };
 
 module.exports = {
-	track(user, state) {
-		State[user] = _.extend({}, State[user], state);
+	async selectPreferredRole(user, role) {
+		const player = await EpsilonDB.getPlayer(user);
+		player.preferredRole = role;
+		player.addChoice(role);
+		player.save();
 	},
-	approveRole(user, role) {
-		State[user] = State[user] || {};
-		State[user].roles = _.chain(State[user].roles || []).concat(role).uniq().sortBy((r) => _.indexOf(ROLES, r)).value();
+	
+	async toggleChoice(user, role) {
+		const player = await EpsilonDB.getPlayer(user);
+		if (player.choices.includes(role)) {
+			player.removeChoice(role);
+			if (player.preferredRole == role) {
+				player.preferredRole = null;
+				player.save();
+			}
+		} else {
+			player.addChoice(role);
+		}
 	},
 
-	buildUI(user) {
-		const state = State[user] || {};
+	async buildUI(user) {
+		const player = await EpsilonDB.getPlayer(user);
 		// *:captain-2: Captain*, *:weapons: Weapons*, *:relay: Relay*, or *:fighter: Fighter Pilot*
-		const chosenRoles = state.roles ? '*' + _.map(state.roles, (r) => ROLE_LABELS[r]).join('*, *') + '*' : 'nothing yet';
+		const chosenRoles = !_.isEmpty(player.choices) ? '*' + _.map(player.choices, (r) => ROLES[r]).join('*, *') + '*' : 'nothing yet';
 		return [
 			SectionBlock({
 				text      : Markdown("_What's your #1 choice?_"),
@@ -85,7 +95,7 @@ module.exports = {
 					'Science'       : ':science: Science',
 					'Relay'         : ':relay: Relay',
 					'Fighter Pilot' : ':fighter: Fighter Pilot',
-				}, state.topChoice),
+				}, player.preferredRole),
 			}),
 
 			Divider(),
@@ -106,7 +116,7 @@ module.exports = {
 			Divider(),
 
 			SectionBlock({
-				text      : Markdown(`You have chosen to play as:\n${chosenRoles}\n(but ideally *${state.topChoice ? ROLE_LABELS[state.topChoice] : 'srsly fucking choose something'}*)`),
+				text      : Markdown(`You have chosen to play as:\n${chosenRoles}\n(but ideally *${player.preferredRole ? ROLES[player.preferredRole] : 'srsly fucking choose something'}*)`),
 				accessory : Image('https://daid.github.io/EmptyEpsilon/images/logo.png', 'empty epsilon logo'),
 			}),
 

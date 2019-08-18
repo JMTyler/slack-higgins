@@ -7,9 +7,9 @@ module.exports = {
 	handle : async (msg, info, reply, error) => {
 		console.log('* INFO:', info);
 		const user = info.user.name;
-		EpsilonService.approveRole(user, info.actions[0].value);
+		await EpsilonService.toggleChoice(user, info.actions[0].value);
 		return reply({
-			blocks : EpsilonService.buildUI(user),
+			blocks : await EpsilonService.buildUI(user),
 		});
 	},
 };

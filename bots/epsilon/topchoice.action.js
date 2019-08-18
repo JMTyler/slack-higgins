@@ -8,9 +8,9 @@ module.exports = {
 		console.log('* INFO:', info);
 		
 		const user = info.user.name;
-		EpsilonService.track(user, { topChoice: info.actions[0].selected_option.value });
+		await EpsilonService.selectPreferredRole(user, info.actions[0].selected_option.value);
 		return reply({
-			blocks : EpsilonService.buildUI(user),
+			blocks : await EpsilonService.buildUI(user),
 		});
 	}
 };

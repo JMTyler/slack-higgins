@@ -66,16 +66,18 @@ module.exports = {
 		player.save();
 	},
 	
-	async toggleChoice(user, role) {
+	async approveRole(user, role) {
 		const player = await EpsilonDB.getPlayer(user);
-		if (player.choices.includes(role)) {
-			player.removeChoice(role);
-			if (player.preferredRole == role) {
-				player.preferredRole = null;
-				player.save();
-			}
-		} else {
-			player.addChoice(role);
+		player.addChoice(role);
+	},
+	
+	async rejectRole(user, role) {
+		const player = await EpsilonDB.getPlayer(user);
+		player.removeChoice(role);
+		
+		if (player.preferredRole == role) {
+			player.preferredRole = null;
+			player.save();
 		}
 	},
 
@@ -108,23 +110,16 @@ module.exports = {
 			Divider(),
 
 			SectionBlock({
-				text: Markdown("_2. Which roles are you *willing* to play, if you don't get your #1 choice?_"),
+				text: Markdown("_2. And if you *don't* get your #1 choice?_"),
 			}),
-			ActionsBlock([
-				Button('epsilon_approve_captain',     ':captain-2: Captain',       'captain'),
-				Button('epsilon_approve_helm',        ':helms: Helm',              'helm'),
-				Button('epsilon_approve_weapons',     ':weapons: Weapons',         'weapons'),
-				Button('epsilon_approve_engineering', ':engineering: Engineering', 'engineering'),
-				Button('epsilon_approve_science',     ':science: Science',         'science'),
-				Button('epsilon_approve_relay',       ':relay: Relay',             'relay'),
-				Button('epsilon_approve_fighter',     ':fighter: Fighter Pilot',   'fighter'),
-			]),
+			ActionsBlock(_.chain(ROLES).pickBy((label, role) => !player.choices.includes(role)).map((label, role) => Button(`epsilon_approve_${role}`, label, role)).value()),
 
 			Divider(),
-
+			
 			SectionBlock({
-				text: Markdown(`You have chosen to play as:\n${chosenRoles}\n(but ideally *${player.preferredRole ? ROLES[player.preferredRole] : 'srsly fucking choose something'}*)`),
+				text: Markdown(`_*Great!* In summary, you'd ideally like to play as *${player.preferredRole ? ROLES[player.preferredRole] : 'srsly fucking choose something'}*, but you're also willing to play any of the following (click to remove):_`),
 			}),
+			ActionsBlock(_.chain(ROLES).pickBy((label, role) => player.choices.includes(role)).map((label, role) => Button(`epsilon_reject_${role}`, label, role)).value()),
 
 			Divider(),
 

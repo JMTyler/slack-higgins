@@ -8,7 +8,12 @@ module.exports = {
 		console.log('* INFO:', info);
 		
 		const user = info.user.name;
-		await EpsilonService.selectPreferredRole(user, info.actions[0].selected_option.value);
+		let role = info.actions[0].selected_option.value;
+		if (role == '<any>') {
+			role = null;
+		}
+		
+		await EpsilonService.selectPreferredRole(user, role);
 		return reply({
 			blocks : await EpsilonService.buildUI(user),
 		});

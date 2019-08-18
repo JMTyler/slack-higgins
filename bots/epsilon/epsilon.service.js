@@ -49,13 +49,13 @@ const Divider = () => {
 };
 
 const ROLES = {
-	'Captain'       : ':captain-2: Captain',
-	'Helms'         : ':helms: Helms',
-	'Weapons'       : ':weapons: Weapons',
-	'Engineering'   : ':engineering: Engineering',
-	'Science'       : ':science: Science',
-	'Relay'         : ':relay: Relay',
-	'Fighter Pilot' : ':fighter: Fighter Pilot',
+	'captain'     : ':captain-2: Captain',
+	'helm'        : ':helms: Helm',
+	'weapons'     : ':weapons: Weapons',
+	'engineering' : ':engineering: Engineering',
+	'science'     : ':science: Science',
+	'relay'       : ':relay: Relay',
+	'fighter'     : ':fighter: Fighter Pilot',
 };
 
 module.exports = {
@@ -85,39 +85,45 @@ module.exports = {
 		const chosenRoles = !_.isEmpty(player.choices) ? '*' + _.map(player.choices, (r) => ROLES[r]).join('*, *') + '*' : 'nothing yet';
 		return [
 			SectionBlock({
-				text      : Markdown("_What's your #1 choice?_"),
+				text      : Markdown(`---\n\n*EmptyEpsilon Preferences for _${user}_*\n\n---`),
+				accessory : Image('https://daid.github.io/EmptyEpsilon/images/logo.png', 'empty epsilon logo'),
+			}),
+			
+			Divider(),
+			
+			SectionBlock({
+				text      : Markdown("_1. What's your #1 choice?_"),
 				accessory : Dropdown('epsilon_topchoice', {
-					'<any>'         : "Don't Care",
-					'Captain'       : ':captain-2: Captain',
-					'Helms'         : ':helms: Helms',
-					'Weapons'       : ':weapons: Weapons',
-					'Engineering'   : ':engineering: Engineering',
-					'Science'       : ':science: Science',
-					'Relay'         : ':relay: Relay',
-					'Fighter Pilot' : ':fighter: Fighter Pilot',
+					'<any>'       : "Don't Care",
+					'captain'     : ':captain-2: Captain',
+					'helm'        : ':helms: Helm',
+					'weapons'     : ':weapons: Weapons',
+					'engineering' : ':engineering: Engineering',
+					'science'     : ':science: Science',
+					'relay'       : ':relay: Relay',
+					'fighter'     : ':fighter: Fighter Pilot',
 				}, player.preferredRole),
 			}),
 
 			Divider(),
 
 			SectionBlock({
-				text: Markdown("_Which roles are you *willing* to play, if you don't get your #1 choice?_"),
+				text: Markdown("_2. Which roles are you *willing* to play, if you don't get your #1 choice?_"),
 			}),
 			ActionsBlock([
-				Button('epsilon_approve_a', ':captain-2: Captain', 'Captain'),
-				Button('epsilon_approve_b', ':helms: Helms', 'Helms'),
-				Button('epsilon_approve_c', ':weapons: Weapons', 'Weapons'),
-				Button('epsilon_approve_d', ':engineering: Engineering', 'Engineering'),
-				Button('epsilon_approve_e', ':science: Science', 'Science'),
-				Button('epsilon_approve_f', ':relay: Relay', 'Relay'),
-				Button('epsilon_approve_g', ':fighter: Fighter Pilot', 'Fighter Pilot'),
+				Button('epsilon_approve_captain',     ':captain-2: Captain',       'captain'),
+				Button('epsilon_approve_helm',        ':helms: Helm',              'helm'),
+				Button('epsilon_approve_weapons',     ':weapons: Weapons',         'weapons'),
+				Button('epsilon_approve_engineering', ':engineering: Engineering', 'engineering'),
+				Button('epsilon_approve_science',     ':science: Science',         'science'),
+				Button('epsilon_approve_relay',       ':relay: Relay',             'relay'),
+				Button('epsilon_approve_fighter',     ':fighter: Fighter Pilot',   'fighter'),
 			]),
 
 			Divider(),
 
 			SectionBlock({
-				text      : Markdown(`You have chosen to play as:\n${chosenRoles}\n(but ideally *${player.preferredRole ? ROLES[player.preferredRole] : 'srsly fucking choose something'}*)`),
-				accessory : Image('https://daid.github.io/EmptyEpsilon/images/logo.png', 'empty epsilon logo'),
+				text: Markdown(`You have chosen to play as:\n${chosenRoles}\n(but ideally *${player.preferredRole ? ROLES[player.preferredRole] : 'srsly fucking choose something'}*)`),
 			}),
 
 			Divider(),

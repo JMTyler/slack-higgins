@@ -26,7 +26,7 @@ class Player extends DB.Sequelize.Model {
 	}
 	
 	async addChoice(role) {
-		if (this.choices.includes(role)) {
+		if (!role || this.choices.includes(role)) {
 			return;
 		}
 		

@@ -11,6 +11,9 @@ module.exports = {
 		// otherwise:
 
 		console.log(info);
+		
+		// TODO: Should we do this?
+		EpsilonService.NOWAIT(info.user_name);
 
 //		console.log('**message response', JSON.stringify(blocks, null, 2));
 		return reply({

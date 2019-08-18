@@ -86,6 +86,18 @@ module.exports = {
 		player.numComputers = puters;
 		player.save();
 	},
+	
+	async READYUP(user) {
+		const player = await EpsilonDB.getPlayer(user);
+		player.ready = true;
+		player.save();
+	},
+	
+	async NOWAIT(user) {
+		const player = await EpsilonDB.getPlayer(user);
+		player.ready = false;
+		player.save();
+	},
 
 	async buildUI(user) {
 		const player = await EpsilonDB.getPlayer(user);

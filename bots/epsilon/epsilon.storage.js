@@ -59,9 +59,9 @@ Player.init({
 		type : DB.Sequelize.TEXT,
 	},
 	numComputers : {
-		type         : DB.Sequelize.INTEGER,
+		type         : DB.Sequelize.TEXT,
 		allowNull    : false,
-		defaultValue : 0,
+		defaultValue : '0',
 	},
 }, {
 	sequelize : DB.sequelize,

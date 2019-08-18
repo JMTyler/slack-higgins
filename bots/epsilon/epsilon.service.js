@@ -80,6 +80,12 @@ module.exports = {
 			player.save();
 		}
 	},
+	
+	async howManyPutersYall(user, puters) {
+		const player = await EpsilonDB.getPlayer(user);
+		player.numComputers = puters;
+		player.save();
+	},
 
 	async buildUI(user) {
 		const player = await EpsilonDB.getPlayer(user);
@@ -120,6 +126,13 @@ module.exports = {
 				text: Markdown(`_*Great!* In summary, you'd ideally like to play as *${player.preferredRole ? ROLES[player.preferredRole] : 'srsly fucking choose something'}*, but you're also willing to play any of the following (click to remove):_`),
 			}),
 			ActionsBlock(_.chain(ROLES).pickBy((label, role) => player.choices.includes(role)).map((label, role) => Button(`epsilon_reject_${role}`, label, role)).value()),
+			
+			Divider(),
+			
+			SectionBlock({
+				text      : Markdown("_3. How many computers can you bring?_"),
+				accessory : Dropdown('epsilon_puters', { '0': '0', '1': '1', '2': '2', '3': '3', '4': '4+' }, player.numComputers),
+			}),
 
 			Divider(),
 

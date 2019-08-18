@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const Slack = require('pico-slack');
-const EpsilonService = require('./epsilon.service');
+const Epsilon = require('../epsilon.service');
 
 module.exports = {
 	id     : 'epsilon_puters',
@@ -9,9 +9,9 @@ module.exports = {
 		
 		const user = info.user.name;
 		const puters = info.actions[0].selected_option.value;
-		await EpsilonService.howManyPutersYall(user, puters);
+		await Epsilon.howManyPutersYall(user, puters);
 		return reply({
-			blocks : await EpsilonService.buildUI(user),
+			blocks : await Epsilon.buildUI(user),
 		});
 	}
 };

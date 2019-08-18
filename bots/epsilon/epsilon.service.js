@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const EpsilonDB = require('./epsilon.storage.js');
+const Storage = require('./epsilon.storage.js');
 
 const Button = (action_id, text, value, style = undefined) => {
 	return {
@@ -60,19 +60,19 @@ const ROLES = {
 
 module.exports = {
 	async selectPreferredRole(user, role) {
-		const player = await EpsilonDB.getPlayer(user);
+		const player = await Storage.getPlayer(user);
 		player.preferredRole = role;
 		player.addChoice(role);
 		player.save();
 	},
 	
 	async approveRole(user, role) {
-		const player = await EpsilonDB.getPlayer(user);
+		const player = await Storage.getPlayer(user);
 		player.addChoice(role);
 	},
 	
 	async rejectRole(user, role) {
-		const player = await EpsilonDB.getPlayer(user);
+		const player = await Storage.getPlayer(user);
 		player.removeChoice(role);
 		
 		if (player.preferredRole == role) {
@@ -82,25 +82,25 @@ module.exports = {
 	},
 	
 	async howManyPutersYall(user, puters) {
-		const player = await EpsilonDB.getPlayer(user);
+		const player = await Storage.getPlayer(user);
 		player.numComputers = puters;
 		player.save();
 	},
 	
 	async READYUP(user) {
-		const player = await EpsilonDB.getPlayer(user);
+		const player = await Storage.getPlayer(user);
 		player.ready = true;
 		player.save();
 	},
 	
 	async NOWAIT(user) {
-		const player = await EpsilonDB.getPlayer(user);
+		const player = await Storage.getPlayer(user);
 		player.ready = false;
 		player.save();
 	},
 
 	async buildUI(user) {
-		const player = await EpsilonDB.getPlayer(user);
+		const player = await Storage.getPlayer(user);
 		// *:captain-2: Captain*, *:weapons: Weapons*, *:relay: Relay*, or *:fighter: Fighter Pilot*
 		const chosenRoles = !_.isEmpty(player.choices) ? '*' + _.map(player.choices, (r) => ROLES[r]).join('*, *') + '*' : 'nothing yet';
 		return [

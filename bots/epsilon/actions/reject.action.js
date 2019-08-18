@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const Slack = require('pico-slack');
-const EpsilonService = require('./epsilon.service');
+const Epsilon = require('../epsilon.service');
 
 const ROLES = ['captain', 'helm', 'weapons', 'engineering', 'science', 'relay', 'fighter'];
 
@@ -9,9 +9,9 @@ module.exports = {
 	handle : async (msg, info, reply, error) => {
 		console.log('* INFO:', info);
 		const user = info.user.name;
-		await EpsilonService.rejectRole(user, info.actions[0].value);
+		await Epsilon.rejectRole(user, info.actions[0].value);
 		return reply({
-			blocks : await EpsilonService.buildUI(user),
+			blocks : await Epsilon.buildUI(user),
 		});
 	},
 };

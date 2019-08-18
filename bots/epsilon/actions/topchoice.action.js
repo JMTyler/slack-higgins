@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const Slack = require('pico-slack');
-const EpsilonService = require('./epsilon.service');
+const Epsilon = require('../epsilon.service');
 
 module.exports = {
 	id     : 'epsilon_topchoice',
@@ -13,9 +13,9 @@ module.exports = {
 			role = null;
 		}
 		
-		await EpsilonService.selectPreferredRole(user, role);
+		await Epsilon.selectPreferredRole(user, role);
 		return reply({
-			blocks : await EpsilonService.buildUI(user),
+			blocks : await Epsilon.buildUI(user),
 		});
 	}
 };
